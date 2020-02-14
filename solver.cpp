@@ -2,6 +2,7 @@
 #include "ui_solver.h"
 #include <QTextBrowser>
 #include <QMessageBox>
+#include <QSignalMapper>
 #include <random>
 #include <ctime>
 #include <chrono>
@@ -12,6 +13,8 @@ Solver::Solver(QWidget *parent)
 {
     ui->setupUi(this);
     //cube = new Cube();
+    connectSignals();
+    renderCube();
 }
 
 Solver::~Solver()
@@ -34,325 +37,361 @@ void Solver::show_exception_timeout()
     QMessageBox::information(this, tr("Error"), tr("The solver timed out. Make sure that the entered pattern has s"));
 }
 
+void Solver::renderCube()
+{
+    //These contain the x and y coordinates for each face
+    const int FACE_LOCATIONS_X[6] = {10, 170, 170, 170, 330, 490};
+    const int FACE_LOCATIONS_Y[6] = {170, 170, 10, 330, 170, 170};
+    //contains information about how many tiles away from the starting corner of each face
+    //in the x and y directions respectively
+    const int CORNER_TILE_OFFSETS_X[4] = {0, 2, 2, 0};
+    const int CORNER_TILE_OFFSETS_Y[4] = {0, 0, 2, 2};
+    const int EDGE_TILE_OFFSETS_X[4] = {1, 2, 1, 0};
+    const int EDGE_TILE_OFFSETS_Y[4] = {0, 1, 2, 1};
+
+    for (int i = 0; i < 6; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            corners[4 * i + j]->setGeometry(FACE_LOCATIONS_X[i] + CORNER_TILE_OFFSETS_X[j] * 50,
+                                    FACE_LOCATIONS_Y[i] + CORNER_TILE_OFFSETS_Y[j] * 50, 51, 51);
+            edges[4 * i + j]->setGeometry(FACE_LOCATIONS_X[i] + EDGE_TILE_OFFSETS_X[j] * 50,
+                                   FACE_LOCATIONS_Y[i] + EDGE_TILE_OFFSETS_Y[j] * 50, 51, 51);
+        }
+    }
+    on_reset_cube_clicked();
+}
+
+void Solver::connectSignals()
+{
+    for (int i = 0; i < 24; i++)
+    {
+        corners[i] = new QPushButton(this);
+        edges[i] = new QPushButton(this);
+        connect(corners[i], &QPushButton::clicked, this, [this, i]{changeCornerTileColor(i); });
+        connect(edges[i], &QPushButton::clicked, this, [this, i]{changeEdgeTileColor(i); });
+    }
+}
+
 void Solver::on_pushButton_clicked()
 {
-    ui->pushButton->setStyleSheet(color.c_str());
-    corners[22] = color_num;
+    ui->pushButton->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[22] = color_num;
 }
 
 void Solver::on_pushButton_2_clicked()
 {
-    ui->pushButton_2->setStyleSheet(color.c_str());
-    edges[15] = color_num;
+    ui->pushButton_2->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[15] = color_num;
 }
 
 void Solver::on_pushButton_3_clicked()
 {
-    ui->pushButton_3->setStyleSheet(color.c_str());
-    corners[14] = color_num;
+    ui->pushButton_3->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[14] = color_num;
 }
 
 void Solver::on_pushButton_4_clicked()
 {
-    ui->pushButton_4->setStyleSheet(color.c_str());
-    edges[23] = color_num;
+    ui->pushButton_4->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[23] = color_num;
 }
 
 void Solver::on_pushButton_6_clicked()
 {
-    ui->pushButton_6->setStyleSheet(color.c_str());
-    edges[17] = color_num;
+    ui->pushButton_6->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[17] = color_num;
 }
 
 void Solver::on_pushButton_7_clicked()
 {
-    ui->pushButton_7->setStyleSheet(color.c_str());
-    corners[11] = color_num;
+    ui->pushButton_7->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[11] = color_num;
 }
 
 void Solver::on_pushButton_8_clicked()
 {
-    ui->pushButton_8->setStyleSheet(color.c_str());
-    edges[7] = color_num;
+    ui->pushButton_8->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[7] = color_num;
 }
 
 void Solver::on_pushButton_9_clicked()
 {
-    ui->pushButton_9->setStyleSheet(color.c_str());
-    corners[1] = color_num;
+    ui->pushButton_9->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[1] = color_num;
 }
 
 void Solver::on_pushButton_10_clicked()
 {
-    ui->pushButton_10->setStyleSheet(color.c_str());
-    corners[13] = color_num;
+    ui->pushButton_10->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[13] = color_num;
 }
 
 void Solver::on_pushButton_11_clicked()
 {
-    ui->pushButton_11->setStyleSheet(color.c_str());
-    edges[9] = color_num;
+    ui->pushButton_11->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[9] = color_num;
 }
 
 void Solver::on_pushButton_12_clicked()
 {
-    ui->pushButton_12->setStyleSheet(color.c_str());
-    corners[17] = color_num;
+    ui->pushButton_12->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[17] = color_num;
 }
 void Solver::on_pushButton_13_clicked()
 {
-    ui->pushButton_13->setStyleSheet(color.c_str());
-    edges[16] = color_num;
+    ui->pushButton_13->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[16] = color_num;
 }
 void Solver::on_pushButton_15_clicked()
 {
-    ui->pushButton_15->setStyleSheet(color.c_str());
-    edges[18] = color_num;
+    ui->pushButton_15->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[18] = color_num;
 }
 
 void Solver::on_pushButton_16_clicked()
 {
-    ui->pushButton_16->setStyleSheet(color.c_str());
-    corners[2] = color_num;
+    ui->pushButton_16->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[2] = color_num;
 }
 
 void Solver::on_pushButton_17_clicked()
 {
-    ui->pushButton_17->setStyleSheet(color.c_str());
-    edges[1] = color_num;
+    ui->pushButton_17->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[1] = color_num;
 }
 
 void Solver::on_pushButton_18_clicked()
 {
-    ui->pushButton_18->setStyleSheet(color.c_str());
-    corners[4] = color_num;
+    ui->pushButton_18->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[4] = color_num;
 }
 
 void Solver::on_pushButton_19_clicked()
 {
-    ui->pushButton_19->setStyleSheet(color.c_str());
-    corners[21] = color_num;
+    ui->pushButton_19->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[21] = color_num;
 }
 
 void Solver::on_pushButton_20_clicked()
 {
-    ui->pushButton_20->setStyleSheet(color.c_str());
-    edges[12] = color_num;
+    ui->pushButton_20->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[12] = color_num;
 }
 
 void Solver::on_pushButton_21_clicked()
 {
-    ui->pushButton_21->setStyleSheet(color.c_str());
-    corners[18] = color_num;
+    ui->pushButton_21->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[18] = color_num;
 }
 
 void Solver::on_pushButton_22_clicked()
 {
-    ui->pushButton_22->setStyleSheet(color.c_str());
-    edges[14] = color_num;
+    ui->pushButton_22->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[14] = color_num;
 }
 
 void Solver::on_pushButton_24_clicked()
 {
-    ui->pushButton_24->setStyleSheet(color.c_str());
-    edges[10] = color_num;
+    ui->pushButton_24->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[10] = color_num;
 }
 
 void Solver::on_pushButton_25_clicked()
 {
-    ui->pushButton_25->setStyleSheet(color.c_str());
-    corners[12] = color_num;
+    ui->pushButton_25->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[12] = color_num;
 }
 void Solver::on_pushButton_26_clicked()
 {
-    ui->pushButton_26->setStyleSheet(color.c_str());
-    edges[8] = color_num;
+    ui->pushButton_26->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[8] = color_num;
 }
 void Solver::on_pushButton_27_clicked()
 {
-    ui->pushButton_27->setStyleSheet(color.c_str());
-    corners[15] = color_num;
+    ui->pushButton_27->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[15] = color_num;
 }
 
 void Solver::on_pushButton_28_clicked()
 {
-    ui->pushButton_28->setStyleSheet(color.c_str());
-    corners[0] = color_num;
+    ui->pushButton_28->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[0] = color_num;
 }
 
 void Solver::on_pushButton_29_clicked()
 {
-    ui->pushButton_29->setStyleSheet(color.c_str());
-    edges[0] = color_num;
+    ui->pushButton_29->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[0] = color_num;
 }
 
 void Solver::on_pushButton_30_clicked()
 {
-    ui->pushButton_30->setStyleSheet(color.c_str());
-    corners[3] = color_num;
+    ui->pushButton_30->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[3] = color_num;
 }
 
 void Solver::on_pushButton_31_clicked()
 {
-    ui->pushButton_31->setStyleSheet(color.c_str());
-    edges[6] = color_num;
+    ui->pushButton_31->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[6] = color_num;
 }
 
 void Solver::on_pushButton_33_clicked()
 {
-    ui->pushButton_33->setStyleSheet(color.c_str());
-    edges[2] = color_num;
+    ui->pushButton_33->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[2] = color_num;
 }
 
 void Solver::on_pushButton_34_clicked()
 {
-    ui->pushButton_34->setStyleSheet(color.c_str());
-    corners[9] = color_num;
+    ui->pushButton_34->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[9] = color_num;
 }
 
 void Solver::on_pushButton_35_clicked()
 {
-    ui->pushButton_35->setStyleSheet(color.c_str());
-    edges[4] = color_num;
+    ui->pushButton_35->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[4] = color_num;
 }
 
 void Solver::on_pushButton_36_clicked()
 {
-    ui->pushButton_36->setStyleSheet(color.c_str());
-    corners[6] = color_num;
+    ui->pushButton_36->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[6] = color_num;
 }
 
 void Solver::on_pushButton_37_clicked()
 {
-    ui->pushButton_37->setStyleSheet(color.c_str());
-    corners[16] = color_num;
+    ui->pushButton_37->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[16] = color_num;
 }
 void Solver::on_pushButton_38_clicked()
 {
-    ui->pushButton_38->setStyleSheet(color.c_str());
-    edges[11] = color_num;
+    ui->pushButton_38->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[11] = color_num;
 }
 void Solver::on_pushButton_39_clicked()
 {
-    ui->pushButton_39->setStyleSheet(color.c_str());
-    corners[20] = color_num;
+    ui->pushButton_39->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[20] = color_num;
 }
 
 void Solver::on_pushButton_40_clicked()
 {
-    ui->pushButton_40->setStyleSheet(color.c_str());
-    edges[19] = color_num;
+    ui->pushButton_40->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[19] = color_num;
 }
 
 void Solver::on_pushButton_42_clicked()
 {
-    ui->pushButton_42->setStyleSheet(color.c_str());
-    edges[21] = color_num;
+    ui->pushButton_42->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[21] = color_num;
 }
 
 void Solver::on_pushButton_43_clicked()
 {
-    ui->pushButton_43->setStyleSheet(color.c_str());
-    corners[5] = color_num;
+    ui->pushButton_43->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[5] = color_num;
 }
 
 void Solver::on_pushButton_44_clicked()
 {
-    ui->pushButton_44->setStyleSheet(color.c_str());
-    edges[3] = color_num;
+    ui->pushButton_44->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[3] = color_num;
 }
 
 void Solver::on_pushButton_45_clicked()
 {
-    ui->pushButton_45->setStyleSheet(color.c_str());
-    corners[7] = color_num;
+    ui->pushButton_45->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[7] = color_num;
 }
 
 void Solver::on_pushButton_46_clicked()
 {
-    ui->pushButton_46->setStyleSheet(color.c_str());
-    corners[19] = color_num;
+    ui->pushButton_46->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[19] = color_num;
 }
 
 void Solver::on_pushButton_47_clicked()
 {
-    ui->pushButton_47->setStyleSheet(color.c_str());
-    edges[13] = color_num;
+    ui->pushButton_47->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[13] = color_num;
 }
 
 void Solver::on_pushButton_48_clicked()
 {
-    ui->pushButton_48->setStyleSheet(color.c_str());
-    corners[23] = color_num;
+    ui->pushButton_48->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[23] = color_num;
 }
 
 void Solver::on_pushButton_49_clicked()
 {
-    ui->pushButton_49->setStyleSheet(color.c_str());
-    edges[20] = color_num;
+    ui->pushButton_49->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[20] = color_num;
 }
 
 void Solver::on_pushButton_51_clicked()
 {
-    ui->pushButton_51->setStyleSheet(color.c_str());
-    edges[22] = color_num;
+    ui->pushButton_51->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[22] = color_num;
 }
 void Solver::on_pushButton_52_clicked()
 {
-    ui->pushButton_52->setStyleSheet(color.c_str());
-    corners[8] = color_num;
+    ui->pushButton_52->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[8] = color_num;
 }
 
 void Solver::on_pushButton_53_clicked()
 {
-    ui->pushButton_53->setStyleSheet(color.c_str());
-    edges[5] = color_num;
+    ui->pushButton_53->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[5] = color_num;
 }
 
 void Solver::on_pushButton_54_clicked()
 {
-    ui->pushButton_54->setStyleSheet(color.c_str());
-    corners[10] = color_num;
+    ui->pushButton_54->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[10] = color_num;
 }
 
 void Solver::on_blue_button_clicked()
 {
-    color = "QPushButton{background-color: blue; border: 1px solid black}";
+    button_color_stylesheet = "QPushButton{background-color: blue; border: 1px solid black}";
     ui->pushButton_64->setStyleSheet("QPushButton{background-color: blue; border: 2px solid black}");
     color_num = 1;
 }
 
 void Solver::on_red_button_clicked()
 {
-    color = "QPushButton{background-color: red; border: 1px solid black}";
+    button_color_stylesheet = "QPushButton{background-color: red; border: 1px solid black}";
     ui->pushButton_64->setStyleSheet("QPushButton{background-color: red; border: 2px solid black}");
     color_num = 2;
 }
 
 void Solver::on_yellow_button_clicked()
 {
-    color = "QPushButton{background-color: yellow; border: 1px solid black}";
+    button_color_stylesheet = "QPushButton{background-color: yellow; border: 1px solid black}";
     ui->pushButton_64->setStyleSheet("QPushButton{background-color: yellow; border: 2px solid black}");
     color_num = 3;
 }
 
 void Solver::on_green_button_clicked()
 {
-    color = "QPushButton{background-color: green; border: 1px solid black}";
+    button_color_stylesheet = "QPushButton{background-color: green; border: 1px solid black}";
     ui->pushButton_64->setStyleSheet("QPushButton{background-color: green; border: 2px solid black}");
     color_num = 4;
 }
 
 void Solver::on_orange_button_clicked()
 {
-    color = "QPushButton{background-color: orange; border: 1px solid black}";
+    button_color_stylesheet = "QPushButton{background-color: orange; border: 1px solid black}";
     ui->pushButton_64->setStyleSheet("QPushButton{background-color: orange; border: 2px solid black}");
     color_num = 5;
 }
 
 void Solver::on_white_button_clicked()
 {
-    color = "QPushButton{background-color: white; border: 1px solid black}";
+    button_color_stylesheet = "QPushButton{background-color: white; border: 1px solid black}";
     ui->pushButton_64->setStyleSheet("QPushButton{background-color: white; border: 2px solid black}");
     color_num = 6;
 }
@@ -375,63 +414,20 @@ void Solver::on_solve_button_clicked()
 
 void Solver::on_reset_cube_clicked()
 {
-    ui->pushButton->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_2->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_3->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_4->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_6->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_7->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_8->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_9->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_10->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_11->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_12->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_13->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_15->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_16->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_17->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_18->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_19->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_20->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_21->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_22->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_24->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_25->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_26->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_27->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_28->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_29->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_30->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_31->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_33->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_34->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_35->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_36->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_37->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_38->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_39->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_40->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_42->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_43->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_44->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_45->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_46->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_47->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_48->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_49->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_51->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_52->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_53->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
-    ui->pushButton_54->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
+    for (int i = 0; i < 24; i++)
+    {
+        corners[i]->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
+        edges[i]->setStyleSheet("background-color: rgb(200, 200, 200); border: 1px solid black");
+    }
     ui->pushButton_64->setStyleSheet("background-color: rgb(200, 200, 200); border: 2px solid black");
 
     color_num = 0;
-    color = "";
+    button_color_stylesheet = "";
 
     for (int i = 0; i < 24; i++)
     {
-        corners[i] = 0;
-        edges[i] = 0;
+        color_of_corners[i] = 0;
+        color_of_edges[i] = 0;
     }
 }
 
@@ -568,114 +564,63 @@ void Solver::on_random_pattern_clicked()
 void Solver::getCoords()//
 {
     unsigned int i = 0;
+    //the number associated with each color for all tiles of each corner are multiplied together to produce unique values
+    //for each corner that can be used to determine which piece is in the current slot regardless of orientation
+    const int CORNER_COLOR_VALS[8] = {12, 48, 120, 30, 6, 24, 60, 15};
+
+    //Same here, except that the sum of the squares of each color number are used to produce unique values
+    const int EDGE_COLOR_VALS[12] = {40, 52, 61, 37, 13, 25, 34, 10, 5, 20, 41, 26};
 
     for (i = 0; i < 24; i++)
     {
-        if (corners[i] == 3 || corners[i] == 6)
+        if (color_of_corners[i] == 3 || color_of_corners[i] == 6)
         {
             entered_pattern.corner_orientations[i / 3] = (i % 3);
         }
     }
 
-    for (i = 0; i < 24; i += 2)
+    for (i = 0; i < 24; i+=2)
     {
-        if (edges[i] == 3 || edges[i] == 6)
+        if (color_of_edges[i] == 3 || color_of_edges[i] == 6 ||
+                color_of_edges[i + 1] == 1 || color_of_edges[i + 1] == 4)
             entered_pattern.edge_orientations[i / 2] = 0;
-        if (edges[i + 1] == 3 || edges[i + 1] == 6)
+        else
             entered_pattern.edge_orientations[i / 2] = 1;
-        if ((edges[i] == 1 || edges[i] == 4) && edges[i + 1] != 3 && edges[i + 1] != 6)
-            entered_pattern.edge_orientations[i / 2] = 1;
-        if ((edges[i] == 2 || edges[i] == 5) && edges[i + 1] != 3 && edges[i + 1] != 6)
-            entered_pattern.edge_orientations[i / 2] = 0;
     }
 
     for (i = 0; i < 24; i += 3)
     {
-        if (corners[i] == 3 || corners[i +1] == 3 || corners[i + 2] == 3)
+        int current_corner = color_of_corners[i] * color_of_corners[i + 1] * color_of_corners[i + 2];
+        bool valid_corner_found = false;
+        for (int j = 0; j < 8; j++)
         {
-            if (corners[i] == 1 || corners[i + 1] == 1 || corners[i + 2] == 1 )
+            if (current_corner == CORNER_COLOR_VALS[j])
             {
-                if (corners[i] == 2 || corners[i + 1] == 2 || corners[i + 2] == 2)
-                {
-                    entered_pattern.cornerPerm[i / 3] = '5';
-                }
-                else
-                    entered_pattern.cornerPerm[i / 3] = '8';
-            }
-            if (corners[i] == 4 || corners[i + 1] == 4 || corners[i + 2] == 4)
-            {
-                if (corners[i] == 2 || corners[i + 1] == 2 || corners[i + 2] == 2)
-                {
-                    entered_pattern.cornerPerm[i / 3] = '6';
-                }
-                else
-                    entered_pattern.cornerPerm[i / 3] = '7';
+                entered_pattern.cornerPerm[i / 3] = (char)j + '1';
+                valid_corner_found = true;
             }
         }
-        if (corners[i] == 6 || corners[i +1] == 6 || corners[i + 2] == 6)
-        {
-            if (corners[i] == 1 || corners[i + 1] == 1 || corners[i + 2] == 1 )
-            {
-                if (corners[i] == 2 || corners[i + 1] == 2 || corners[i + 2] == 2)
-                {
-                    entered_pattern.cornerPerm[i / 3] = '1';
-                }
-                else
-                    entered_pattern.cornerPerm[i / 3] = '4';
-            }
-            if (corners[i] == 4 || corners[i + 1] == 4 || corners[i + 2] == 4)
-            {
-                if (corners[i] == 2 || corners[i + 1] == 2 || corners[i + 2] == 2)
-                {
-                    entered_pattern.cornerPerm[i / 3] = '2';
-                }
-                else
-                    entered_pattern.cornerPerm[i / 3] = '3';
-            }
-        }
+        if (!valid_corner_found)
+            entered_pattern.cornerPerm[i / 3] = '0';
     }
 
     for (i = 0; i < 24; i += 2)
     {
-        if (edges[i] == 3 || edges[i + 1] == 3)
+        int current_edge = color_of_edges[i] * color_of_edges[i] + color_of_edges[i + 1] * color_of_edges[i + 1];
+        bool valid_corner_found = false;
+        for (int j = 0; j < 12; j++)
         {
-            if (edges[i] == 1 || edges[i + 1] == 1)
-                entered_pattern.edgePerm[i / 2] = '8';
-            if (edges[i] == 2 || edges[i + 1] == 2)
-                entered_pattern.edgePerm[i / 2] = '5';
-            if (edges[i] == 4 || edges[i + 1] == 4)
-                entered_pattern.edgePerm[i / 2] = '6';
-            if (edges[i] == 5 || edges[i + 1] == 5)
-                entered_pattern.edgePerm[i / 2] = '7';
+            if (current_edge == EDGE_COLOR_VALS[j])
+            {
+                if (j < 9)
+                    entered_pattern.edgePerm[i / 2] = (char)j + '1';
+                else
+                    entered_pattern.edgePerm[i / 2] = (char)j + '8';
+                valid_corner_found = true;
+            }
         }
-
-        if (edges[i] == 6 || edges[i + 1] == 6)
-        {
-            if (edges[i] == 1 || edges[i + 1] == 1)
-                entered_pattern.edgePerm[i / 2] = '4';
-            if (edges[i] == 2 || edges[i + 1] == 2)
-                entered_pattern.edgePerm[i / 2] = '1';
-            if (edges[i] == 4 || edges[i + 1] == 4)
-                entered_pattern.edgePerm[i / 2] = '2';
-            if (edges[i] == 5 || edges[i + 1] == 5)
-                entered_pattern.edgePerm[i / 2] = '3';
-        }
-
-        if (edges[i] == 1 || edges[i + 1] == 1)
-        {
-            if (edges[i] == 2 || edges[i + 1] == 2)
-                entered_pattern.edgePerm[i / 2] = '9';
-            if (edges[i] == 5 || edges[i + 1] == 5)
-                entered_pattern.edgePerm[i / 2] = 'C';
-        }
-
-        if (edges[i] == 4 || edges[i + 1] == 4)
-        {
-            if (edges[i] == 2 || edges[i + 1] == 2)
-                entered_pattern.edgePerm[i / 2] = 'A';
-            if (edges[i] == 5 || edges[i + 1] == 5)
-                entered_pattern.edgePerm[i / 2] = 'B';
-        }
+        if (!valid_corner_found)
+            entered_pattern.edgePerm[i / 3] = '0';
     }
 
     for (i = 0; i < 12; i++)
@@ -699,30 +644,30 @@ bool Solver::completeCube()
 
     for (int i = 0; i < 24; i++)
     {
-        if (corners[i] == 1)
+        if (color_of_corners[i] == 1)
             blue++;
-        if (corners[i] == 2)
+        if (color_of_corners[i] == 2)
             red++;
-        if (corners[i] == 3)
+        if (color_of_corners[i] == 3)
             yellow++;
-        if (corners[i] == 4)
+        if (color_of_corners[i] == 4)
             green++;
-        if (corners[i] == 5)
+        if (color_of_corners[i] == 5)
             orange++;
-        if (corners[i] == 6)
+        if (color_of_corners[i] == 6)
             white++;
 
-        if (edges[i] == 1)
+        if (color_of_edges[i] == 1)
             blue++;
-        if (edges[i] == 2)
+        if (color_of_edges[i] == 2)
             red++;
-        if (edges[i] == 3)
+        if (color_of_edges[i] == 3)
             yellow++;
-        if (edges[i] == 4)
+        if (color_of_edges[i] == 4)
             green++;
-        if (edges[i] == 5)
+        if (color_of_edges[i] == 5)
             orange++;
-        if (edges[i] == 6)
+        if (color_of_edges[i] == 6)
             white++;
     }
 
@@ -842,6 +787,49 @@ void Solver::displaySolution()
     ui->textBrowser->setText(str);
 }
 
+void Solver::makeFaceTurn(int face_to_turn, int direction)
+{
+    const int CORNER_TILES_TO_SWAP[6][4][3] = {{{0, 1, 2}, {5, 3, 4}, {15, 16, 17}, {14, 12, 13}}, {{9, 10, 11}, {2, 0, 1}, {12, 13, 14}, {23, 21, 22}},
+                                               {{13, 14, 12}, {16, 17, 15}, {19, 20, 18}, {22, 23, 21}}, {{6, 7, 8}, {11, 9, 10}, {21, 22, 23}, {20, 18, 19}},
+                                               {{3, 4, 5}, {8, 6, 7}, {18, 19, 20}, {17, 15, 16}}, {{10, 11, 9}, {7, 8, 6}, {4, 5, 3}, {1, 2, 0}}};
+
+    const int EDGE_TILES_TO_SWAP[6][4][2] = {{{0, 1}, {19, 18}, {8, 9}, {17, 16}}, {{6, 7}, {16, 17}, {14, 15}, {22, 23}}, {{9, 8}, {11, 10}, {13, 12}, {15, 14}},
+                                             {{4, 5}, {23, 22}, {12, 13}, {21, 20}}, {{2, 3}, {20, 21}, {10, 11}, {18, 19}}, {{5, 4}, {3, 2}, {1, 0}, {7, 6}}};
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 3; j++)
+            color_of_corners[CORNER_TILES_TO_SWAP[face_to_turn][i][j]] = color_of_corners[CORNER_TILES_TO_SWAP[face_to_turn][(i + direction) % 4][j]];
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 2; j++)
+            color_of_edges[EDGE_TILES_TO_SWAP[face_to_turn][i][j]] = color_of_edges[EDGE_TILES_TO_SWAP[face_to_turn][(i + direction) % 4][j]];
+    }
+    colorCubeTiles();
+}
+
+void Solver::colorCubeTiles()
+{
+    const int CORNER_FACE_TO_TILE_MAPPING[24] = {12, 2, 7, 13, 6, 19, 14, 18, 23, 15, 22, 3, 11, 4, 1, 10, 16, 5, 9, 20, 17, 8, 0, 21};
+    const int EDGE_FACE_TO_TILE_MAPPING[24] = {12, 6, 13, 18, 14, 22, 15, 2, 18, 4, 9, 16, 8, 20, 11, 0, 7, 1, 5, 19, 23, 17, 21, 3};
+    const string COLOR_STYLESHEETS[6] = {"blue", "red", "yellow", "green", "orange", "white"};
+    string color =  "";
+    for (int i = 0; i < 24; i++)
+    {
+        if (color_of_corners[i] > 0 && color_of_corners[i] < 7)
+        {
+            color = "QPushButton{background-color: " + COLOR_STYLESHEETS[color_of_corners[i] - 1] + "; border: 1px solid black}";
+            corners[CORNER_FACE_TO_TILE_MAPPING[i]]->setStyleSheet(color.c_str());
+        }
+        if (color_of_edges[i] > 0 && color_of_edges[i] < 7)
+        {
+            color = "QPushButton{background-color: " + COLOR_STYLESHEETS[color_of_edges[i] - 1] + "; border: 1px solid black}";
+            edges[EDGE_FACE_TO_TILE_MAPPING[i]]->setStyleSheet(color.c_str());
+        }
+    }
+
+}
+
 void Solver::move_F()
 {
     QString temp_corner1 = ui->pushButton_16->styleSheet();
@@ -876,37 +864,37 @@ void Solver::move_F()
     ui->pushButton_26->setStyleSheet(ui->pushButton_6->styleSheet());
     ui->pushButton_6->setStyleSheet(temp_edge2);
 
-    int cpy_c1 = corners[2];
-    int cpy_c2 = corners[0];
-    int cpy_c3 = corners[1];
+    int cpy_c1 = color_of_corners[2];
+    int cpy_c2 = color_of_corners[0];
+    int cpy_c3 = color_of_corners[1];
 
-    int cpy_e1 = edges[1];
-    int cpy_e2 = edges[0];
+    int cpy_e1 = color_of_edges[1];
+    int cpy_e2 = color_of_edges[0];
 
-    corners[2] = corners[4];
-    corners[4] = corners[17];
-    corners[17] = corners[13];
-    corners[13] = cpy_c1;
+    color_of_corners[2] = color_of_corners[4];
+    color_of_corners[4] = color_of_corners[17];
+    color_of_corners[17] = color_of_corners[13];
+    color_of_corners[13] = cpy_c1;
 
-    corners[0] = corners[5];
-    corners[5] = corners[15];
-    corners[15] = corners[14];
-    corners[14] = cpy_c2;
+    color_of_corners[0] = color_of_corners[5];
+    color_of_corners[5] = color_of_corners[15];
+    color_of_corners[15] = color_of_corners[14];
+    color_of_corners[14] = cpy_c2;
 
-    corners[1] = corners[3];
-    corners[3] = corners[16];
-    corners[16] = corners[12];
-    corners[12] = cpy_c3;
+    color_of_corners[1] = color_of_corners[3];
+    color_of_corners[3] = color_of_corners[16];
+    color_of_corners[16] = color_of_corners[12];
+    color_of_corners[12] = cpy_c3;
 
-    edges[1] = edges[18];
-    edges[18] = edges[9];
-    edges[9] = edges[16];
-    edges[16] = cpy_e1;
+    color_of_edges[1] = color_of_edges[18];
+    color_of_edges[18] = color_of_edges[9];
+    color_of_edges[9] = color_of_edges[16];
+    color_of_edges[16] = cpy_e1;
 
-    edges[0] = edges[19];
-    edges[19] = edges[8];
-    edges[8] = edges[17];
-    edges[17] = cpy_e2;
+    color_of_edges[0] = color_of_edges[19];
+    color_of_edges[19] = color_of_edges[8];
+    color_of_edges[8] = color_of_edges[17];
+    color_of_edges[17] = cpy_e2;
 }
 void Solver::move_Fi()
 {
@@ -955,37 +943,37 @@ void Solver::move_L()
     ui->pushButton_22->setStyleSheet(ui->pushButton_51->styleSheet());
     ui->pushButton_51->setStyleSheet(temp_edge2);
 
-    int cpy_c1 = corners[11];
-    int cpy_c2 = corners[9];
-    int cpy_c3 = corners[10];
+    int cpy_c1 = color_of_corners[11];
+    int cpy_c2 = color_of_corners[9];
+    int cpy_c3 = color_of_corners[10];
 
-    int cpy_e1 = edges[7];
-    int cpy_e2 = edges[6];
+    int cpy_e1 = color_of_edges[7];
+    int cpy_e2 = color_of_edges[6];
 
-    corners[11] = corners[1];
-    corners[1] = corners[14];
-    corners[14] = corners[22];
-    corners[22] = cpy_c1;
+    color_of_corners[11] = color_of_corners[1];
+    color_of_corners[1] = color_of_corners[14];
+    color_of_corners[14] = color_of_corners[22];
+    color_of_corners[22] = cpy_c1;
 
-    corners[9] = corners[2];
-    corners[2] = corners[12];
-    corners[12] = corners[23];
-    corners[23] = cpy_c2;
+    color_of_corners[9] = color_of_corners[2];
+    color_of_corners[2] = color_of_corners[12];
+    color_of_corners[12] = color_of_corners[23];
+    color_of_corners[23] = cpy_c2;
 
-    corners[10] = corners[0];
-    corners[0] = corners[13];
-    corners[13] = corners[21];
-    corners[21] = cpy_c3;
+    color_of_corners[10] = color_of_corners[0];
+    color_of_corners[0] = color_of_corners[13];
+    color_of_corners[13] = color_of_corners[21];
+    color_of_corners[21] = cpy_c3;
 
-    edges[7] = edges[17];
-    edges[17] = edges[15];
-    edges[15] = edges[23];
-    edges[23] = cpy_e1;
+    color_of_edges[7] = color_of_edges[17];
+    color_of_edges[17] = color_of_edges[15];
+    color_of_edges[15] = color_of_edges[23];
+    color_of_edges[23] = cpy_e1;
 
-    edges[6] = edges[16];
-    edges[16] = edges[14];
-    edges[14] = edges[22];
-    edges[22] = cpy_e2;
+    color_of_edges[6] = color_of_edges[16];
+    color_of_edges[16] = color_of_edges[14];
+    color_of_edges[14] = color_of_edges[22];
+    color_of_edges[22] = cpy_e2;
 }
 void Solver::move_Li()
 {
@@ -1034,37 +1022,37 @@ void Solver::move_U()
     ui->pushButton_47->setStyleSheet(ui->pushButton_2->styleSheet());
     ui->pushButton_2->setStyleSheet(temp_edge2);
 
-    int cpy_c1 = corners[12];
-    int cpy_c2 = corners[13];
-    int cpy_c3 = corners[14];
+    int cpy_c1 = color_of_corners[12];
+    int cpy_c2 = color_of_corners[13];
+    int cpy_c3 = color_of_corners[14];
 
-    int cpy_e1 = edges[8];
-    int cpy_e2 = edges[9];
+    int cpy_e1 = color_of_edges[8];
+    int cpy_e2 = color_of_edges[9];
 
-    corners[12] = corners[15];
-    corners[15] = corners[18];
-    corners[18] = corners[21];
-    corners[21] = cpy_c1;
+    color_of_corners[12] = color_of_corners[15];
+    color_of_corners[15] = color_of_corners[18];
+    color_of_corners[18] = color_of_corners[21];
+    color_of_corners[21] = cpy_c1;
 
-    corners[13] = corners[16];
-    corners[16] = corners[19];
-    corners[19] = corners[22];
-    corners[22] = cpy_c2;
+    color_of_corners[13] = color_of_corners[16];
+    color_of_corners[16] = color_of_corners[19];
+    color_of_corners[19] = color_of_corners[22];
+    color_of_corners[22] = cpy_c2;
 
-    corners[14] = corners[17];
-    corners[17] = corners[20];
-    corners[20] = corners[23];
-    corners[23] = cpy_c3;
+    color_of_corners[14] = color_of_corners[17];
+    color_of_corners[17] = color_of_corners[20];
+    color_of_corners[20] = color_of_corners[23];
+    color_of_corners[23] = cpy_c3;
 
-    edges[8] = edges[10];
-    edges[10] = edges[12];
-    edges[12] = edges[14];
-    edges[14] = cpy_e1;
+    color_of_edges[8] = color_of_edges[10];
+    color_of_edges[10] = color_of_edges[12];
+    color_of_edges[12] = color_of_edges[14];
+    color_of_edges[14] = cpy_e1;
 
-    edges[9] = edges[11];
-    edges[11] = edges[13];
-    edges[13] = edges[15];
-    edges[15] = cpy_e2;
+    color_of_edges[9] = color_of_edges[11];
+    color_of_edges[11] = color_of_edges[13];
+    color_of_edges[13] = color_of_edges[15];
+    color_of_edges[15] = cpy_e2;
 }
 void Solver::move_Ui()
 {
@@ -1113,37 +1101,37 @@ void Solver::move_B()
     ui->pushButton_20->setStyleSheet(ui->pushButton_42->styleSheet());
     ui->pushButton_42->setStyleSheet(temp_edge2);
 
-    int cpy_c1 = corners[8];
-    int cpy_c2 = corners[6];
-    int cpy_c3 = corners[7];
+    int cpy_c1 = color_of_corners[8];
+    int cpy_c2 = color_of_corners[6];
+    int cpy_c3 = color_of_corners[7];
 
-    int cpy_e1 = edges[5];
-    int cpy_e2 = edges[4];
+    int cpy_e1 = color_of_edges[5];
+    int cpy_e2 = color_of_edges[4];
 
-    corners[8] = corners[10];
-    corners[10] = corners[23];
-    corners[23] = corners[19];
-    corners[19] = cpy_c1;
+    color_of_corners[8] = color_of_corners[10];
+    color_of_corners[10] = color_of_corners[23];
+    color_of_corners[23] = color_of_corners[19];
+    color_of_corners[19] = cpy_c1;
 
-    corners[6] = corners[11];
-    corners[11] = corners[21];
-    corners[21] = corners[20];
-    corners[20] = cpy_c2;
+    color_of_corners[6] = color_of_corners[11];
+    color_of_corners[11] = color_of_corners[21];
+    color_of_corners[21] = color_of_corners[20];
+    color_of_corners[20] = cpy_c2;
 
-    corners[7] = corners[9];
-    corners[9] = corners[22];
-    corners[22] = corners[18];
-    corners[18] = cpy_c3;
+    color_of_corners[7] = color_of_corners[9];
+    color_of_corners[9] = color_of_corners[22];
+    color_of_corners[22] = color_of_corners[18];
+    color_of_corners[18] = cpy_c3;
 
-    edges[5] = edges[22];
-    edges[22] = edges[13];
-    edges[13] = edges[20];
-    edges[20] = cpy_e1;
+    color_of_edges[5] = color_of_edges[22];
+    color_of_edges[22] = color_of_edges[13];
+    color_of_edges[13] = color_of_edges[20];
+    color_of_edges[20] = cpy_e1;
 
-    edges[4] = edges[23];
-    edges[23] = edges[12];
-    edges[12] = edges[21];
-    edges[21] = cpy_e2;
+    color_of_edges[4] = color_of_edges[23];
+    color_of_edges[23] = color_of_edges[12];
+    color_of_edges[12] = color_of_edges[21];
+    color_of_edges[21] = cpy_e2;
 }
 void Solver::move_Bi()
 {
@@ -1192,37 +1180,37 @@ void Solver::move_R()
     ui->pushButton_24->setStyleSheet(ui->pushButton_15->styleSheet());
     ui->pushButton_15->setStyleSheet(temp_edge2);
 
-    int cpy_c1 = corners[5];
-    int cpy_c2 = corners[3];
-    int cpy_c3 = corners[4];
+    int cpy_c1 = color_of_corners[5];
+    int cpy_c2 = color_of_corners[3];
+    int cpy_c3 = color_of_corners[4];
 
-    int cpy_e1 = edges[3];
-    int cpy_e2 = edges[2];
+    int cpy_e1 = color_of_edges[3];
+    int cpy_e2 = color_of_edges[2];
 
-    corners[5] = corners[7];
-    corners[7] = corners[20];
-    corners[20] = corners[16];
-    corners[16] = cpy_c1;
+    color_of_corners[5] = color_of_corners[7];
+    color_of_corners[7] = color_of_corners[20];
+    color_of_corners[20] = color_of_corners[16];
+    color_of_corners[16] = cpy_c1;
 
-    corners[3] = corners[8];
-    corners[8] = corners[18];
-    corners[18] = corners[17];
-    corners[17] = cpy_c2;
+    color_of_corners[3] = color_of_corners[8];
+    color_of_corners[8] = color_of_corners[18];
+    color_of_corners[18] = color_of_corners[17];
+    color_of_corners[17] = cpy_c2;
 
-    corners[4] = corners[6];
-    corners[6] = corners[19];
-    corners[19] = corners[15];
-    corners[15] = cpy_c3;
+    color_of_corners[4] = color_of_corners[6];
+    color_of_corners[6] = color_of_corners[19];
+    color_of_corners[19] = color_of_corners[15];
+    color_of_corners[15] = cpy_c3;
 
-    edges[3] = edges[21];
-    edges[21] = edges[11];
-    edges[11] = edges[19];
-    edges[19] = cpy_e1;
+    color_of_edges[3] = color_of_edges[21];
+    color_of_edges[21] = color_of_edges[11];
+    color_of_edges[11] = color_of_edges[19];
+    color_of_edges[19] = cpy_e1;
 
-    edges[2] = edges[20];
-    edges[20] = edges[10];
-    edges[10] = edges[18];
-    edges[18] = cpy_e2;
+    color_of_edges[2] = color_of_edges[20];
+    color_of_edges[20] = color_of_edges[10];
+    color_of_edges[10] = color_of_edges[18];
+    color_of_edges[18] = cpy_e2;
 }
 void Solver::move_Ri()
 {
@@ -1271,37 +1259,37 @@ void Solver::move_D()
     ui->pushButton_17->setStyleSheet(ui->pushButton_8->styleSheet());
     ui->pushButton_8->setStyleSheet(temp_edge2);
 
-    int cpy_c1 = corners[9];
-    int cpy_c2 = corners[10];
-    int cpy_c3 = corners[11];
+    int cpy_c1 = color_of_corners[9];
+    int cpy_c2 = color_of_corners[10];
+    int cpy_c3 = color_of_corners[11];
 
-    int cpy_e1 = edges[4];
-    int cpy_e2 = edges[5];
+    int cpy_e1 = color_of_edges[4];
+    int cpy_e2 = color_of_edges[5];
 
-    corners[9] = corners[6];
-    corners[6] = corners[3];
-    corners[3] = corners[0];
-    corners[0] = cpy_c1;
+    color_of_corners[9] = color_of_corners[6];
+    color_of_corners[6] = color_of_corners[3];
+    color_of_corners[3] = color_of_corners[0];
+    color_of_corners[0] = cpy_c1;
 
-    corners[10] = corners[7];
-    corners[7] = corners[4];
-    corners[4] = corners[1];
-    corners[1] = cpy_c2;
+    color_of_corners[10] = color_of_corners[7];
+    color_of_corners[7] = color_of_corners[4];
+    color_of_corners[4] = color_of_corners[1];
+    color_of_corners[1] = cpy_c2;
 
-    corners[11] = corners[8];
-    corners[8] = corners[5];
-    corners[5] = corners[2];
-    corners[2] = cpy_c3;
+    color_of_corners[11] = color_of_corners[8];
+    color_of_corners[8] = color_of_corners[5];
+    color_of_corners[5] = color_of_corners[2];
+    color_of_corners[2] = cpy_c3;
 
-    edges[4] = edges[2];
-    edges[2] = edges[0];
-    edges[0] = edges[6];
-    edges[6] = cpy_e1;
+    color_of_edges[4] = color_of_edges[2];
+    color_of_edges[2] = color_of_edges[0];
+    color_of_edges[0] = color_of_edges[6];
+    color_of_edges[6] = cpy_e1;
 
-    edges[5] = edges[3];
-    edges[3] = edges[1];
-    edges[1] = edges[7];
-    edges[7] = cpy_e2;
+    color_of_edges[5] = color_of_edges[3];
+    color_of_edges[3] = color_of_edges[1];
+    color_of_edges[1] = color_of_edges[7];
+    color_of_edges[7] = cpy_e2;
 }
 void Solver::move_Di()
 {
@@ -1314,6 +1302,27 @@ void Solver::move_D2()
 {
     move_D();
     move_D();
+}
+
+void Solver::changeCornerTileColor(int changed_corner_id)
+{
+    //Each button is mapped to one of 3 sides of each of the 8 corners, which are labeled in a particular order that
+    //differs from their placement on the screen. This mapping allows permutation and orientation to be found by simply
+    //iterating through the set of 24 colors.
+    const int TILE_TO_CORNER_FACE_MAPPING[24] = {22, 14, 1, 11, 13, 17, 4, 2, 21, 18, 15, 12, 0, 3, 6, 9, 16, 20, 7, 5, 19, 23, 10, 8};
+
+    corners[changed_corner_id]->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_corners[TILE_TO_CORNER_FACE_MAPPING[changed_corner_id]] = color_num;
+}
+
+void Solver::changeEdgeTileColor(int changed_edge_id)
+{
+    //Same thing done here as the corners, but for the edges. Note that because edges have 2 faces instead of 3, the mapping
+    //differs from that of the corners
+    const int TILE_TO_EDGE_FACE_MAPPING[24] = {15, 17, 7, 23, 9, 18, 1, 16, 12, 10, 8, 14, 0, 2, 4, 6, 11, 21, 3, 19, 13, 22, 5, 20};
+
+    edges[changed_edge_id]->setStyleSheet(button_color_stylesheet.c_str());
+    color_of_edges[TILE_TO_EDGE_FACE_MAPPING[changed_edge_id]] = color_num;
 }
 
 void Solver::on_fF_clicked()
@@ -1408,112 +1417,18 @@ void Solver::on_Di_button_clicked()
 
 void Solver::on_solved_cube_clicked()
 {
-    on_blue_button_clicked();
-    on_pushButton_clicked();
+    const string COLORS[6] = {"blue", "red", "yellow", "white", "green", "orange"};
 
-    on_pushButton_2_clicked();
-
-    on_pushButton_3_clicked();
-
-    on_pushButton_4_clicked();
-
-    on_pushButton_6_clicked();
-
-    on_pushButton_7_clicked();
-
-    on_pushButton_8_clicked();
-
-    on_pushButton_9_clicked();
-
-    on_red_button_clicked();
-    on_pushButton_10_clicked();
-
-    on_pushButton_11_clicked();
-
-    on_pushButton_12_clicked();
-
-    on_pushButton_13_clicked();
-
-    on_pushButton_15_clicked();
-
-    on_pushButton_16_clicked();
-
-    on_pushButton_17_clicked();
-
-    on_pushButton_18_clicked();
-
-    on_yellow_button_clicked();
-    on_pushButton_19_clicked();
-
-    on_pushButton_20_clicked();
-
-    on_pushButton_21_clicked();
-
-    on_pushButton_22_clicked();
-
-    on_pushButton_24_clicked();
-
-    on_pushButton_25_clicked();
-
-    on_pushButton_26_clicked();
-
-    on_pushButton_27_clicked();
-
-    on_white_button_clicked();
-    on_pushButton_28_clicked();
-
-    on_pushButton_29_clicked();
-
-    on_pushButton_30_clicked();
-
-    on_pushButton_31_clicked();
-
-    on_pushButton_33_clicked();
-
-    on_pushButton_34_clicked();
-
-    on_pushButton_35_clicked();
-
-    on_pushButton_36_clicked();
-
-    on_green_button_clicked();
-    on_pushButton_37_clicked();
-
-    on_pushButton_38_clicked();
-
-    on_pushButton_39_clicked();
-
-    on_pushButton_40_clicked();
-
-    on_pushButton_42_clicked();
-
-    on_pushButton_43_clicked();
-
-    on_pushButton_44_clicked();
-
-    on_pushButton_45_clicked();
-
-    on_orange_button_clicked();
-    on_pushButton_46_clicked();
-
-    on_pushButton_47_clicked();
-
-    on_pushButton_48_clicked();
-
-    on_pushButton_49_clicked();
-
-    on_pushButton_51_clicked();
-
-    on_pushButton_52_clicked();
-
-    on_pushButton_53_clicked();
-
-    on_pushButton_54_clicked();
-
+    for (int i = 0; i < 24; i++)
+    {
+        string color_stylesheet = "background-color: " + COLORS[i / 4] + "; border: 1px solid black";
+        corners[i]->setStyleSheet(color_stylesheet.c_str());
+        edges[i]->setStyleSheet(color_stylesheet.c_str());
+    }
     ui->pushButton_64->setStyleSheet("background-color: rgb(200, 200, 200); border: 2px solid black");
 
     color_num = 0;
-    color = "";
+    button_color_stylesheet = "";
 
 }
 

@@ -147,14 +147,14 @@ void Cube::applyMoveString(int face_turns, int directions, pattern &p)
     {
         if (face_turns / current_digit_val > 0 && directions / current_digit_val > 0)
         {
-            performMove(face_turns / current_digit_val, directions / current_digit_val, p);
+            makeFaceTurn(face_turns / current_digit_val, directions / current_digit_val, p);
             face_turns -= (face_turns / current_digit_val) * current_digit_val;
             directions -= (directions / current_digit_val) * current_digit_val;
         }
     }
 }
 
-void Cube::performMove(int face_to_turn, int direction, pattern &current_cube_state)
+void Cube::makeFaceTurn(int face_to_turn, int direction, pattern &current_cube_state)
 {
     const int NUMBER_OF_EDGES = 4;
     pattern mapping_pattern;

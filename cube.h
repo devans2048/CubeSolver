@@ -96,29 +96,46 @@ private:
 public:
     //each of these functions will load the move tables and pattern databases from their respective file.
     void loadMoveTables();
+    /* loads the tables containing all combinations of moves which are length 7 or less. One table contains every combination of
+     * face turns and the other table contains all combinations of directions in which to turn the faces. These combinations are represented by
+     * int values where each digit corresponds with a particular move or direction.
+     */
+
     void loadP2Transpositions();
+    // loads patterns that were reached by applying moves (6 or less) that do not affect orientation of corners or edges and are used in phase 2
+
     void loadP1Patterns();
+    // loads the orientation sets and the permutation of the middle slice edges contained in each phase 1 pattern and places them into a table
+
     void loadP2Patterns();
+    // loads the permutation sets for the corners and edges contained in the phase 2 patterns and places them into a table
 
     void applyMoveString(int face_turns, int directions, pattern &p);
-    //applies a sequence of moves
+    //applies a sequence of moves, taking an int representing the sequence of face turns and another int for the sequence of directions in which
+    //each face should be turned. Each digit of these ints represents a single move to apply to the pattern passed into the function
 
-    void performMove(int face_to_turn, int direction, pattern &current_cube_state);
+    void makeFaceTurn(int face_to_turn, int direction, pattern &current_cube_state);
     //Applies a move given parameter 1-6 that represents the face to turn and another that is 1-3, representing the number of quarter turns to make
     //as well as the pattern to modify. (ex: 2, 3 will rotate the blue face counter clockwise)
+
     void transposePieces(phase2_pattern &current_transpos, phase2_pattern &current_p2_pattern);
-    //swaps the pieces in the pattern to assimilate the turning of a face by mapping them from a copied pattern (source) to the parameter pattern(destination)
+    /* Takes the current phase 2 pattern and maps the pieces to a destination based on another pattern reached in 6 or less moves.
+     * Each piece in the current pattern will be adjusted based on how each piece in the transposing pattern was affected by applying the
+     * corresponding moves from a solved state. For example, if in the transposing pattern the corner that belongs in the first slot
+     * moved to the third slot, then the first corner in the current pattern will be moved to the third.
+     */
 
     phase1_pattern constructP1Pattern(pattern p);
-    //separates the orientation sets and the placements of the middle slice edge
-    //calculates a numerical value for each set for more efficient operation
+    //calculates the orientation values for corners and edges based on (turns the base 2 and 3 elements of each array in the pattern to a
+    //single base 10 int respectively) for comparison against the values contained in the pattern database
 
     phase2_pattern constructP2Pattern(pattern p);
-    //separates the permutation sets and stores them in FIXED LENGTH strings
+    //reduces the pattern to only its permutation sets for comparison against the table of (depth 7 or fewer) phase 2 patterns
 
     template<class patternType>
     int pattern_exists(patternType p_to_search, patternType collection_to_search[] ,int collection_length);
-    //uses binary search to determine if a pattern exists in the collection and returns the index if found or -1 if not
+    //uses binary search to determine if the reached pattern can be solved in 6 moves or less (or 7 in phase 2) by determining if the current
+    //pattern is a member of the table of patterns that were reached by applying that number of moves or less.
 
     void setPatternEqualTo(pattern &p, pattern &q);
     //sets the first parameter equal to the second

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTextBrowser>
+#include <QPushButton>
 #include "cube.h"
 
 QT_BEGIN_NAMESPACE
@@ -21,11 +22,16 @@ public:
     void show_exception_io_error(const char* fileName);
     void show_exception_timeout();
 
+    void renderCube();
+    void connectSignals();
+
     void getCoords();
     bool validPattern();
     bool completeCube();
     void displaySolution();
 
+    void makeFaceTurn(int face_to_turn, int direction);
+    void colorCubeTiles();
     void move_F();
     void move_Fi();
     void move_F2();
@@ -51,8 +57,13 @@ public:
     void move_D2();
 
     Cube solver;
+signals:
+    //emits an int denoting the face of one of 24 edge or corner faces so that the selected color can be applied
+    void cubePieceTileClicked(int piece_face_num);
 
 private slots:
+    void changeCornerTileColor(int);
+    void changeEdgeTileColor(int);
 
     void on_pushButton_clicked();
 
@@ -217,11 +228,17 @@ private slots:
 private:
     Ui::Solver *ui;
     //Cube cube;
+    const int CORNER_BUTTON_LOCATIONS_X[24] = {};
+    const int CORNER_BUTTON_LOCATIONS_Y[24] = {};
+    const int EDGE_BUTTON_LOCATIONS_X[24] = {};
+    const int EDGE_BUTTON_LOCATIONS_Y[24] = {};
+    QPushButton * corners[24];
+    QPushButton * edges[24];
 
-    std::string color = "";
+    std::string button_color_stylesheet = "";
     int color_num = 0;
-    int corners[24];
-    int edges[24];
+    int color_of_corners[24];
+    int color_of_edges[24];
     int random_moves[20];
 
     int solution_move_strings_face_turns[4];
