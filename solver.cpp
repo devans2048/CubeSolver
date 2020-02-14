@@ -15,6 +15,7 @@ Solver::Solver(QWidget *parent)
     //cube = new Cube();
     connectSignals();
     renderCube();
+    setupFaceTurnButtons();
 }
 
 Solver::~Solver()
@@ -70,6 +71,28 @@ void Solver::connectSignals()
         edges[i] = new QPushButton(this);
         connect(corners[i], &QPushButton::clicked, this, [this, i]{changeCornerTileColor(i); });
         connect(edges[i], &QPushButton::clicked, this, [this, i]{changeEdgeTileColor(i); });
+    }
+}
+
+void Solver::setupFaceTurnButtons()
+{
+    const string MOVE_NOTATION[18] = {"F", "F2", "Fi", "L", "L2", "Li", "U", "U2", "Ui", "B", "B2", "Bi" ,"R", "R2", "Ri", "D", "D2", "Di"};
+
+    for (int i = 0; i < 18; i++)
+    {
+        face_turn_buttons[i] = new QPushButton(this);
+        face_turn_buttons[i]->setText(MOVE_NOTATION[i].c_str());
+    }
+
+    for (int i = 0; i < 6; i++)
+    {
+        int button_location_y = 380 + 40 * i;
+        for (int j = 0; j < 3; j++)
+        {
+            int button_location_x = 360 + 50 * j;
+            face_turn_buttons[i * 3 + j]->setGeometry(button_location_x, button_location_y, 41, 31);
+            connect(face_turn_buttons[i * 3 + j], &QPushButton::clicked, this, [this, i, j]{makeFaceTurn(i, j + 1);});
+        }
     }
 }
 
@@ -566,14 +589,14 @@ void Solver::getCoords()//
     unsigned int i = 0;
     //the number associated with each color for all tiles of each corner are multiplied together to produce unique values
     //for each corner that can be used to determine which piece is in the current slot regardless of orientation
-    const int CORNER_COLOR_VALS[8] = {12, 48, 120, 30, 6, 24, 60, 15};
+    const int CORNER_COLOR_VALS[8] = {8, 40, 120, 24, 6, 30, 90, 18};
 
     //Same here, except that the sum of the squares of each color number are used to produce unique values
-    const int EDGE_COLOR_VALS[12] = {40, 52, 61, 37, 13, 25, 34, 10, 5, 20, 41, 26};
+    const int EDGE_COLOR_VALS[12] = {20, 41, 52, 17, 13, 34, 45, 10, 5, 29, 61, 37};
 
     for (i = 0; i < 24; i++)
     {
-        if (color_of_corners[i] == 3 || color_of_corners[i] == 6)
+        if (color_of_corners[i] == 3 || color_of_corners[i] == 4)
         {
             entered_pattern.corner_orientations[i / 3] = (i % 3);
         }
@@ -581,8 +604,8 @@ void Solver::getCoords()//
 
     for (i = 0; i < 24; i+=2)
     {
-        if (color_of_edges[i] == 3 || color_of_edges[i] == 6 ||
-                color_of_edges[i + 1] == 1 || color_of_edges[i + 1] == 4)
+        if (color_of_edges[i] == 3 || color_of_edges[i] == 4 ||
+                color_of_edges[i + 1] == 1 || color_of_edges[i + 1] == 5)
             entered_pattern.edge_orientations[i / 2] = 0;
         else
             entered_pattern.edge_orientations[i / 2] = 1;
@@ -795,15 +818,24 @@ void Solver::makeFaceTurn(int face_to_turn, int direction)
 
     const int EDGE_TILES_TO_SWAP[6][4][2] = {{{0, 1}, {19, 18}, {8, 9}, {17, 16}}, {{6, 7}, {16, 17}, {14, 15}, {22, 23}}, {{9, 8}, {11, 10}, {13, 12}, {15, 14}},
                                              {{4, 5}, {23, 22}, {12, 13}, {21, 20}}, {{2, 3}, {20, 21}, {10, 11}, {18, 19}}, {{5, 4}, {3, 2}, {1, 0}, {7, 6}}};
+    int copy_of_corners[24];
+    int copy_of_edges[24];
+
+    for (int i = 0; i < 24; i++)
+    {
+        copy_of_corners[i] = color_of_corners[i];
+        copy_of_edges[i] = color_of_edges[i];
+    }
+
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 3; j++)
-            color_of_corners[CORNER_TILES_TO_SWAP[face_to_turn][i][j]] = color_of_corners[CORNER_TILES_TO_SWAP[face_to_turn][(i + direction) % 4][j]];
+            color_of_corners[CORNER_TILES_TO_SWAP[face_to_turn][i][j]] = copy_of_corners[CORNER_TILES_TO_SWAP[face_to_turn][(i + direction) % 4][j]];
     }
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 2; j++)
-            color_of_edges[EDGE_TILES_TO_SWAP[face_to_turn][i][j]] = color_of_edges[EDGE_TILES_TO_SWAP[face_to_turn][(i + direction) % 4][j]];
+            color_of_edges[EDGE_TILES_TO_SWAP[face_to_turn][i][j]] = copy_of_edges[EDGE_TILES_TO_SWAP[face_to_turn][(i + direction) % 4][j]];
     }
     colorCubeTiles();
 }
@@ -811,8 +843,8 @@ void Solver::makeFaceTurn(int face_to_turn, int direction)
 void Solver::colorCubeTiles()
 {
     const int CORNER_FACE_TO_TILE_MAPPING[24] = {12, 2, 7, 13, 6, 19, 14, 18, 23, 15, 22, 3, 11, 4, 1, 10, 16, 5, 9, 20, 17, 8, 0, 21};
-    const int EDGE_FACE_TO_TILE_MAPPING[24] = {12, 6, 13, 18, 14, 22, 15, 2, 18, 4, 9, 16, 8, 20, 11, 0, 7, 1, 5, 19, 23, 17, 21, 3};
-    const string COLOR_STYLESHEETS[6] = {"blue", "red", "yellow", "green", "orange", "white"};
+    const int EDGE_FACE_TO_TILE_MAPPING[24] = {12, 6, 13, 18, 14, 22, 15, 2, 10, 4, 9, 16, 8, 20, 11, 0, 7, 1, 5, 19, 23, 17, 21, 3};
+    const string COLOR_STYLESHEETS[6] = {"blue", "red", "yellow", "white", "green", "orange"};
     string color =  "";
     for (int i = 0; i < 24; i++)
     {
@@ -1418,17 +1450,20 @@ void Solver::on_Di_button_clicked()
 void Solver::on_solved_cube_clicked()
 {
     const string COLORS[6] = {"blue", "red", "yellow", "white", "green", "orange"};
-
+    const int TILE_TO_CORNER_FACE_MAPPING[24] = {22, 14, 1, 11, 13, 17, 4, 2, 21, 18, 15, 12, 0, 3, 6, 9, 16, 20, 7, 5, 19, 23, 10, 8};
+    const int TILE_TO_EDGE_FACE_MAPPING[24] = {15, 17, 7, 23, 9, 18, 1, 16, 12, 10, 8, 14, 0, 2, 4, 6, 11, 21, 3, 19, 13, 22, 5, 20};
     for (int i = 0; i < 24; i++)
     {
         string color_stylesheet = "background-color: " + COLORS[i / 4] + "; border: 1px solid black";
         corners[i]->setStyleSheet(color_stylesheet.c_str());
         edges[i]->setStyleSheet(color_stylesheet.c_str());
+        color_of_corners[TILE_TO_CORNER_FACE_MAPPING[i]] = (i / 4) + 1;
+        color_of_edges[TILE_TO_EDGE_FACE_MAPPING[i]] = (i / 4) + 1;
     }
     ui->pushButton_64->setStyleSheet("background-color: rgb(200, 200, 200); border: 2px solid black");
 
     color_num = 0;
     button_color_stylesheet = "";
-
+    colorCubeTiles();
 }
 

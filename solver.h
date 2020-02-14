@@ -24,13 +24,14 @@ public:
 
     void renderCube();
     void connectSignals();
+    void setupFaceTurnButtons();
 
     void getCoords();
     bool validPattern();
     bool completeCube();
     void displaySolution();
 
-    void makeFaceTurn(int face_to_turn, int direction);
+
     void colorCubeTiles();
     void move_F();
     void move_Fi();
@@ -62,6 +63,7 @@ signals:
     void cubePieceTileClicked(int piece_face_num);
 
 private slots:
+    void makeFaceTurn(int face_to_turn, int direction);
     void changeCornerTileColor(int);
     void changeEdgeTileColor(int);
 
@@ -234,6 +236,7 @@ private:
     const int EDGE_BUTTON_LOCATIONS_Y[24] = {};
     QPushButton * corners[24];
     QPushButton * edges[24];
+    QPushButton * face_turn_buttons[18];
 
     std::string button_color_stylesheet = "";
     int color_num = 0;
