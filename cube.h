@@ -7,6 +7,20 @@
 
 using namespace std;
 
+class IOException : public exception
+{
+public:
+    virtual const char* what() const throw()
+    {
+        return "One or more necessary files could not be opened. Make sure the following files are in the directory of the program: \n"
+               "cube_moves_face_turns.bin \n"
+               "cube_moves_directions.bin \n"
+               "phase_1_patterns.bin \n"
+               "phase_2_patterns.bin \n"
+               "phase_2_transpositions.bin";
+    }
+};
+
 struct pattern{
     int corner_orientations[8] = { 0,0,0,0,0,0,0,0 }; //these contain the number for which the amount of clockwise turns applied to each corner from its correct orientation.
     int edge_orientations[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 }; //1's represent bad edges and 0's represent good edges (look up the tutorial fot the ZZ method for more info)
@@ -71,12 +85,12 @@ private:
     const int indices_for_face_turn_str_length[7] = {0, 6, 36, 186, 936, 4686, 23436};
     const int indices_for_dir_length[7] = {0, 3, 12, 39, 120, 363, 1092};
 
-    int * face_turns_of_move_strs = new int[NUM_OF_FACE_TURN_COMBINATIONS];
-    int * directions_of_move_strs = new int[NUM_OF_DIRECTION_COMBINATIONS];
+    int * face_turns_of_move_strs;
+    int * directions_of_move_strs;
 
-    phase1_pattern * intermediate_phase_1_patterns = new phase1_pattern[NUM_OF_PHASE_1_PATTERNS];
-    phase2_pattern * intermediate_phase_2_patterns = new phase2_pattern[NUM_OF_PHASE_2_PATTERNS];
-    phase2_pattern * phase_2_transpositions = new phase2_pattern[NUM_OF_PHASE_2_MOVE_STRS];
+    phase1_pattern * intermediate_phase_1_patterns;
+    phase2_pattern * intermediate_phase_2_patterns;
+    phase2_pattern * phase_2_transpositions;
 
     pattern starting_pattern;
     pattern working_pattern;

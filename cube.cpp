@@ -68,6 +68,13 @@ bool operator==(const phase2_pattern &first, const phase2_pattern &second)
 
 Cube::Cube()
 {
+    face_turns_of_move_strs = new int[NUM_OF_FACE_TURN_COMBINATIONS];
+    directions_of_move_strs = new int[NUM_OF_DIRECTION_COMBINATIONS];
+
+    intermediate_phase_1_patterns = new phase1_pattern[NUM_OF_PHASE_1_PATTERNS];
+    intermediate_phase_2_patterns = new phase2_pattern[NUM_OF_PHASE_2_PATTERNS];
+    phase_2_transpositions = new phase2_pattern[NUM_OF_PHASE_2_MOVE_STRS];
+
     loadMoveTables();
     loadP2Transpositions();
     loadP1Patterns();
@@ -79,10 +86,16 @@ void Cube::loadMoveTables()
    ifstream in;
 
    in.open("cube_moves_face_turns.bin", ios::binary | ios::in);
+   if (!in.is_open())
+       throw IOException();
+
    in.read((char*)(face_turns_of_move_strs), sizeof (int) * NUM_OF_FACE_TURN_COMBINATIONS);
    in.close();
 
    in.open("cube_moves_directions.bin", ios::binary | ios::in);
+   if (!in.is_open())
+       throw IOException();
+
    in.read((char*)(directions_of_move_strs), sizeof(int) * NUM_OF_DIRECTION_COMBINATIONS);
    in.close();
 }
@@ -92,6 +105,8 @@ void Cube::loadP2Transpositions()
     ifstream in;
     phase2_pattern current_tr_pos;
     in.open("phase_2_transpositions.bin", ios::binary | ios::in);
+    if (!in.is_open())
+        throw IOException();
 
     for (int i = 0; i < NUM_OF_PHASE_2_MOVE_STRS; i++)
     {
@@ -111,7 +126,7 @@ void Cube::loadP1Patterns()
     phase1_pattern current_pattern;
     in.open("phase_1_patterns.bin", ios::binary | ios::in);
     if (!in.is_open())
-        cout << "error";
+        throw IOException();
 
     for (int i = 0; i < NUM_OF_PHASE_1_PATTERNS; i++)
     {
@@ -130,6 +145,9 @@ void Cube::loadP2Patterns()
     ifstream in;
     phase2_pattern current_pattern;
     in.open("phase_2_patterns.bin", ios::binary | ios::in);
+    if (!in.is_open())
+        throw IOException();
+
     for (int i = 0; i < NUM_OF_PHASE_2_PATTERNS; i++)
     {
         in.read((char*)current_pattern.corner_permutation.c_str(), current_pattern.corner_permutation.size());
