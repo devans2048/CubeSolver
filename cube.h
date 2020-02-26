@@ -4,10 +4,11 @@
 #include <fstream>
 #include <string>
 #include <cmath>
+#include <chrono>
 
-using namespace std;
+//using namespace std;
 
-class IOException : public exception
+class IOException : public std::exception
 {
 public:
     virtual const char* what() const throw()
@@ -24,8 +25,8 @@ public:
 struct pattern{
     int corner_orientations[8] = { 0,0,0,0,0,0,0,0 }; //these contain the number for which the amount of clockwise turns applied to each corner from its correct orientation.
     int edge_orientations[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 }; //1's represent bad edges and 0's represent good edges (look up the tutorial fot the ZZ method for more info)
-    string cornerPerm = "12345678";//These three variables contain the placement of the pieces
-    string edgePerm = "123456789ABC";
+    std::string cornerPerm = "12345678";//These three variables contain the placement of the pieces
+    std::string edgePerm = "123456789ABC";
     int ud_slice_edges[12] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1};
 };
 struct phase1_pattern{
@@ -47,8 +48,8 @@ struct phase1_pattern{
     }
 };
 struct phase2_pattern{
-    string corner_permutation = "12345678";
-    string edge_permutation = "123456789ABC";
+    std::string corner_permutation = "12345678";
+    std::string edge_permutation = "123456789ABC";
     int solution_face_turns_index = 0;
     short solution_directions_index = 0;
 
@@ -85,6 +86,8 @@ private:
     const int indices_for_face_turn_str_length[7] = {0, 6, 36, 186, 936, 4686, 23436};
     const int indices_for_dir_length[7] = {0, 3, 12, 39, 120, 363, 1092};
 
+    std::chrono::duration<double> solution_time_in_seconds;
+
     int * face_turns_of_move_strs;
     int * directions_of_move_strs;
 
@@ -104,8 +107,8 @@ private:
     int solution_move_strings_face_turns[4] = {0, 0, 0, 0};
     int solution_move_strings_directions[4] = {0, 0, 0, 0};
 
-    string solution_move_str_face_turns = "";
-    string solution_move_str_directions = "";
+    std::string solution_move_str_face_turns = "";
+    std::string solution_move_str_directions = "";
 
 public:
     //each of these functions will load the move tables and pattern databases from their respective file.
@@ -158,8 +161,7 @@ public:
     //obtains the pattern from the user interface
     void solveCube();
 
-    string getSolutionString();
-    void optimizeSolutionSeq();
+    std::string getSolutionString();
 
 
     Cube();

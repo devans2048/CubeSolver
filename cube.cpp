@@ -6,7 +6,6 @@
 #include <chrono>
 #include <vector>
 
-using namespace std;
 
 
 bool operator>(const phase1_pattern &first, const phase1_pattern &second)
@@ -83,7 +82,9 @@ Cube::Cube()
 
 void Cube::loadMoveTables()
 {
-   ifstream in;
+   using std::ios;
+
+   std::ifstream in;
 
    in.open("cube_moves_face_turns.bin", ios::binary | ios::in);
    if (!in.is_open())
@@ -102,7 +103,9 @@ void Cube::loadMoveTables()
 
 void Cube::loadP2Transpositions()
 {
-    ifstream in;
+    using std::ios;
+
+    std::ifstream in;
     phase2_pattern current_tr_pos;
     in.open("phase_2_transpositions.bin", ios::binary | ios::in);
     if (!in.is_open())
@@ -122,7 +125,8 @@ void Cube::loadP2Transpositions()
 
 void Cube::loadP1Patterns()
 {
-    ifstream in;
+    using std::ios;
+    std::ifstream in;
     phase1_pattern current_pattern;
     in.open("phase_1_patterns.bin", ios::binary | ios::in);
     if (!in.is_open())
@@ -142,7 +146,8 @@ void Cube::loadP1Patterns()
 
 void Cube::loadP2Patterns()
 {
-    ifstream in;
+    using std::ios;
+    std::ifstream in;
     phase2_pattern current_pattern;
     in.open("phase_2_patterns.bin", ios::binary | ios::in);
     if (!in.is_open())
@@ -211,25 +216,26 @@ void Cube::makeFaceTurn(int face_to_turn, int direction, pattern &current_cube_s
 
 void Cube::transposePieces(phase2_pattern &mapping_pattern, phase2_pattern &current_p2_pattern)
 {
+    using std::string;
     string x = current_p2_pattern.corner_permutation;
     string y = current_p2_pattern.edge_permutation;
     int i = 0;
 
     for (i = 0; i < 8; i++)
     {
-        current_p2_pattern.corner_permutation[i] = x[static_cast<int>(mapping_pattern.corner_permutation[i] - '1')];
+        if (x[i] >= '1' && x[i] <= '8')
+            current_p2_pattern.corner_permutation[i] = x[static_cast<int>(mapping_pattern.corner_permutation[i] - '1')];
         //get the numerical value of the char so that it can be used as index in the permutation set
     }
 
     for (i = 0; i < 12; i++)
     {
-        if (mapping_pattern.edge_permutation[i] < 'A')
-        {
+        if (y[i] >= '1' && y[i] <= '9')
             current_p2_pattern.edge_permutation[i] = y[static_cast<int>(mapping_pattern.edge_permutation[i]- '1')];
-        }
-        else
+
+        if (y[i] >= 'A' && y[i] <= 'C')
             current_p2_pattern.edge_permutation[i] = y[static_cast<int>(mapping_pattern.edge_permutation[i]- '8')];
-            //this removes the offset from A B or C to 9, 10, and 11 respectively
+            //this removes the offset from A B or C to int value of 9, 10, and 11 respectively
     }
 }
 
@@ -285,10 +291,14 @@ void Cube::setStartingPattern(pattern p)
 
 void Cube::solveCube()
 {
+    using namespace std::chrono;
+    using std::to_string;
+
     bool cube_is_solved = false;
     int current_p1_face_turn_combination = 0;
     int length_of_current_move_str = 0;
-    float count = 0;
+    auto start = high_resolution_clock::now();
+
     while (!cube_is_solved)
     {
         setPatternEqualTo(working_pattern, starting_pattern);
@@ -339,17 +349,17 @@ void Cube::solveCube()
                 applyMoveString(face_turns_of_move_strs[phase_2_transpositions[i].solution_face_turns_index], directions_of_move_strs[phase_2_transpositions[i].solution_directions_index], working_pattern);
                 applyMoveString(face_turns_of_move_strs[intermediate_phase_2_patterns[index_of_matching_pattern].solution_face_turns_index]
                         , directions_of_move_strs[intermediate_phase_2_patterns[index_of_matching_pattern].solution_directions_index], working_pattern);
-                count += i;
             }
         }
-        if (!cube_is_solved)
-            count += NUM_OF_PHASE_2_MOVE_STRS;
     }
-    cout << "Phase 2 cycles: " << count / NUM_OF_PHASE_2_MOVE_STRS << " " << "times" << endl;
+    auto end = high_resolution_clock::now();
+    solution_time_in_seconds = end - start;
 }
 
-string Cube::getSolutionString()
+std::string Cube::getSolutionString()
 {
+    using std::string;
+    using std::to_string;
     string solution = "";
     for (int i = 0; i < (int)solution_move_str_directions.length(); i++)
     {
@@ -421,12 +431,8 @@ string Cube::getSolutionString()
         }
         solution += to_string(i + 1) + ". " + "Turn the " + face_color + " face " + direction + ". (" + notation + ")" + "\n";
     }
+    solution += "-----Solution found in " + to_string(solution_time_in_seconds.count()) + " seconds-----";
     return solution;
-}
-
-void Cube::optimizeSolutionSeq()
-{
-
 }
 
 Cube::~Cube()

@@ -18,10 +18,6 @@ public:
     Solver(QWidget *parent = nullptr);
     ~Solver();
 
-    void show_exception_bad_alloc();
-    void show_exception_io_error(const char* fileName);
-    void show_exception_timeout();
-
     void renderCube();
     void connectSignals();
     void setupFaceTurnButtons();

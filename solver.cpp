@@ -10,19 +10,7 @@ Solver::Solver(QWidget *parent)
     , ui(new Ui::Solver)
 {
     ui->setupUi(this);
-    try
-    {
-        solver = new Cube();
-    }
-    catch(const std::bad_alloc &e)
-    {
-        QMessageBox::information(this, tr("Error"),
-                                 tr("There is not enough free memory to run the program. Make sure you have 100 MB of free memory."));
-    }
-    catch(IOException &e)
-    {
-        QMessageBox::information(this, tr("Error"), tr(e.what()));
-    }
+    solver = new Cube();
 
     connectSignals();
     renderCube();
@@ -32,21 +20,6 @@ Solver::Solver(QWidget *parent)
 Solver::~Solver()
 {
     delete ui;
-}
-
-void Solver::show_exception_bad_alloc()
-{
-    QMessageBox::information(this, tr("Error"), tr("There is not enough free memory. Make sure you have at least 100 MB of free memory."));
-}
-
-void Solver::show_exception_io_error(const char* fileName)
-{
-    QMessageBox::information(this, tr("Error"), tr(fileName));
-}
-
-void Solver::show_exception_timeout()
-{
-    QMessageBox::information(this, tr("Error"), tr("The solver timed out. Make sure that the entered pattern has s"));
 }
 
 void Solver::renderCube()
@@ -87,7 +60,7 @@ void Solver::connectSignals()
 
 void Solver::setupFaceTurnButtons()
 {
-    const string MOVE_NOTATION[18] = {"F", "F2", "Fi", "L", "L2", "Li", "U", "U2", "Ui", "B", "B2", "Bi" ,"R", "R2", "Ri", "D", "D2", "Di"};
+    const std::string MOVE_NOTATION[18] = {"F", "F2", "Fi", "L", "L2", "Li", "U", "U2", "Ui", "B", "B2", "Bi" ,"R", "R2", "Ri", "D", "D2", "Di"};
 
     for (int i = 0; i < 18; i++)
     {
@@ -282,6 +255,7 @@ void Solver::getCoords()//
 
 bool Solver::completeCube()
 {
+    using std::string;
     int num_of_each_color[6] = {0, 0, 0, 0, 0, 0};
     const string COLORS[6] = {"blue", "red", "yellow", "white", "green", "orange"};
     string error_msg;
@@ -371,7 +345,7 @@ bool Solver::validPattern()
 
 void Solver::displaySolution()
 {
-    string temp = solver->getSolutionString();
+    std::string temp = solver->getSolutionString();
 
     QString str = QString::fromStdString(temp);
     ui->textBrowser->setFontPointSize(9);
@@ -410,6 +384,7 @@ void Solver::makeFaceTurn(int face_to_turn, int direction)
 
 void Solver::colorCubeTiles()
 {
+    using std::string;
     const int CORNER_FACE_TO_TILE_MAPPING[24] = {12, 2, 7, 13, 6, 19, 14, 18, 23, 15, 22, 3, 11, 4, 1, 10, 16, 5, 9, 20, 17, 8, 0, 21};
     const int EDGE_FACE_TO_TILE_MAPPING[24] = {12, 6, 13, 18, 14, 22, 15, 2, 10, 4, 9, 16, 8, 20, 11, 0, 7, 1, 5, 19, 23, 17, 21, 3};
     const string COLOR_STYLESHEETS[6] = {"blue", "red", "yellow", "white", "green", "orange"};
@@ -453,6 +428,7 @@ void Solver::changeEdgeTileColor(int changed_edge_id)
 
 void Solver::on_solved_cube_clicked()
 {
+    using std::string;
     const string COLORS[6] = {"blue", "red", "yellow", "white", "green", "orange"};
     const int TILE_TO_CORNER_FACE_MAPPING[24] = {22, 14, 1, 11, 13, 17, 4, 2, 21, 18, 15, 12, 0, 3, 6, 9, 16, 20, 7, 5, 19, 23, 10, 8};
     const int TILE_TO_EDGE_FACE_MAPPING[24] = {15, 17, 7, 23, 9, 18, 1, 16, 12, 10, 8, 14, 0, 2, 4, 6, 11, 21, 3, 19, 13, 22, 5, 20};
