@@ -53,8 +53,9 @@ Simply make a pull request, create an issue, or reach me at dylanevans595@gmail.
 additional features
 
 ## License
-This project is licensed under the MIT License, which can be found [here](LICENSE)
-Note that this project uses Qt 5.14.0 libraries, which are licensed under LGPLv3.
+This project is licensed under the MIT License, which can be found [here](LICENSE).
+Note that this project uses Qt 5.14.0 libraries, which are licensed under LGPLv3. Thus it is necessary to use these libraries in a way
+which complies with that license. For more information, see the [LGPLv3](https://opensource.org/licenses/lgpl-3.0.html)
 
 ## Credits
 Special thanks to Herbert Kociemba, who devised the Two Phase Algorithm, on which this program is based (Note that this program
