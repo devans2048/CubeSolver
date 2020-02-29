@@ -1,0 +1,23 @@
+#How CubeSolver works
+
+##Overview
+The solver works by first taking the cube to a state where all corners and edges are oriented correctly, and no edge that belongs in the 
+middle slice is located in either the top or bottom layers. Every corner and edge with white or yellow will have its white or yellow face
+facing the white or yellow side if those are the faces on the top and bottom of the cube, for example. Such a state is known as G1. The
+solver then permutes the pieces in a way that brings the cube to its solved state.
+
+##Getting a cube to G1
+Since this process takes at most 12 moves, the solver starts by applying a sequence of 6 moves or fewer and compares the result against a 
+set of patterns. These patterns are found by applying 6 moves or less from the solved state since the solved state is the simplest G1 
+pattern to use. They were then sorted to allow for binary search, a very fast way to search through hundreds of thousands of patterns.
+A match would indicate that the current pattern can be solved in 6 or less moves. Each of these patterns have with 
+them the solutions which bring them back to the solved state. These two sequences together (the 6 starting moves and the solution of the 
+intermediate pattern) are used to bring the cube to G1.
+
+##Solving the cube
+This process is similar to getting to G1, except that certain moves cannot be used since they bring the cube out of G1. Clockwise and 
+counter clockwise turns are not allowed on the front, back, left, and right faces. This limits the solver to using only 10 of 18 possible
+single moves. A set of 6 moves or fewer that only use such face turns are applied and then the result is compared against a sorted set of
+patterns made by applying a set of 7 or fewer moves in the same way. If all sets of 6 moves or fewer are applied and no match is found, 
+then the solver  starts over by finding the next G1 state from the original pattern. Note that there are many more phase 1 solutions for
+a given pattern than those of phase 2. This algorithm should never exhaust all G1 states this way.
