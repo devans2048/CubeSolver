@@ -9,8 +9,7 @@ The app includes an interactive 2-d cube on which face turns may be applied, as 
 * 1 GHz (2 cores) CPU or better
 
 ### Installing
-Download the .zip and extract it to a folder in your PC's file manager. The .exe can be run from the file or a shortcut can be made and
-added to the desktop. Make sure that the .bin files are in the same directory as the .exe or the program won't run.
+Download CubeSolver.zip by clicking on it and then clicking "Download" and extract it to a folder in your PC's file manager. The .exe can be run from the file or a shortcut can be made andadded to the desktop. Make sure that the .bin and .dll files are in the same directory as the .exe or the program won't run.
 
 ### How to use
 To input a pattern, simply click "Empty Cube" to make a blank cube (except the centers), and then use the color buttons to select the 
