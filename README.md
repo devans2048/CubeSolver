@@ -1,8 +1,6 @@
 # CubeSolver
-A desktop app that solves Rubik's Cubes in 24 moves or less using a variation of Kociemba's algorithm. It includes an interactive 2-d 
-cube on which face turns may be applied, as well as an editor for user input patterns. Includes pattern validation and random scrambling
-and a display for the solution, which shows the colors of the faces to be turned, as well as the notation that matches the buttons to 
-allow for solving the 2d-cube. The display also shows the amount of time it took for each solution to be found.
+A desktop app that solves Rubik's Cubes in 24 moves or less using a variation of Kociemba's algorithm. This app was made as a hobby project, which gave me a challenge to create a simpler and easier to understand implementation of a solving algorithm, as well as a way to learn how to delvelop GUI apps. 
+The app includes an interactive 2-d cube on which face turns may be applied, as well as an editor for user input patterns. Includes pattern validation and random scramblingand a display for the solution, which shows the colors of the faces to be turned, as well as the notation that matches the buttons to allow for solving the 2d-cube. The display also shows the amount of time it took for each solution to be found. For more information about how the algorithm works, see the HOW_CUBESOLVER_WORKS.md file
 
 ## Getting started
 ### Hardware Requirements
@@ -45,7 +43,7 @@ Cube" was clicked first.
 
 If the program "freezes", make sure that the .bin files have not been modified or replace them with the original copies. If the issue
 persists or any other problem arises and none of the solutions provided are applicable or work, you may create an issue (if you use
-GitHub) or reach me at
+GitHub) or reach me at dylanevans595@gmail.com.
 
 ## Built with
 * Qt 5.14.0 (MSVC 2017) -- The framework used
