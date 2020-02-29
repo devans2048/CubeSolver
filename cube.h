@@ -11,8 +11,6 @@
 #include <cmath>
 #include <chrono>
 
-
-
 class IOException : public std::exception
 {
 public:

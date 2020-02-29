@@ -130,7 +130,7 @@ void Solver::on_white_button_clicked()
 void Solver::on_solve_button_clicked()
 {
     getCoords();
-    if (completeCube() && validPattern())
+    if (isCompleteCube() && validPattern())
     {
         solver->solveCube();
         displaySolution();
@@ -261,7 +261,7 @@ void Solver::getCoords()//
     solver->setStartingPattern(entered_pattern);
 }
 
-bool Solver::completeCube()
+bool Solver::isCompleteCube()
 {
     using std::string;
     int num_of_each_color[6] = {0, 0, 0, 0, 0, 0};
