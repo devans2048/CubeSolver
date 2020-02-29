@@ -1,6 +1,10 @@
+/* Copyright (C) 2020 Dylan Evans - All Rights Reserved
+ * You may use, distribute, or modify this code under the terms of the MIT license
+ * You should have received a copy of the license with this file. If not, you may visit https://opensource.org/licenses/MIT
+*/
+
 #ifndef SOLVER_H
 #define SOLVER_H
-
 #include <QMainWindow>
 #include <QTextBrowser>
 #include <QPushButton>
@@ -61,7 +65,7 @@ private slots:
 private:
     Ui::Solver *ui;
     Cube * solver;
-    //Cube cube;
+
     const int CORNER_BUTTON_LOCATIONS_X[24] = {};
     const int CORNER_BUTTON_LOCATIONS_Y[24] = {};
     const int EDGE_BUTTON_LOCATIONS_X[24] = {};
@@ -74,7 +78,8 @@ private:
     int color_num = 0;
     int color_of_corners[24];
     int color_of_edges[24];
-    int random_moves[20];
+    int random_moves[40];
+    //40 random moves will result in an acceptably uniform distribution of random patterns reached
 
     int solution_move_strings_face_turns[4];
     int solution_move_strings_directions[4];

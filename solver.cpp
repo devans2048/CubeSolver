@@ -1,3 +1,8 @@
+/* Copyright (C) 2020 Dylan Evans - All Rights Reserved
+ * You may use, distribute, or modify this code under the terms of the MIT license
+ * You should have received a copy of the license with this file. If not, you may visit https://opensource.org/licenses/MIT
+*/
+
 #include "solver.h"
 #include "ui_solver.h"
 #include <QTextBrowser>
@@ -157,7 +162,10 @@ void Solver::on_random_pattern_clicked()
     static std::mt19937 generator(std::time(nullptr));
     std::uniform_int_distribution<int> dist(0, 17);
 
-    for (int i = 0; i < 20; i++)
+    //set the cube to a solved state first to ensure that a valid pattern is reached
+    on_solved_cube_clicked();
+
+    for (int i = 0; i < 40; i++)
     {
         random_moves[i] = dist(generator);
     }

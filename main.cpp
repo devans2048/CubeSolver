@@ -1,3 +1,8 @@
+/* Copyright (C) 2020 Dylan Evans - All Rights Reserved
+ * You may use, distribute, or modify this code under the terms of the MIT license
+ * You should have received a copy of the license with this file. If not, you may visit https://opensource.org/licenses/MIT
+*/
+
 #include "solver.h"
 
 #include <QApplication>
