@@ -1,6 +1,6 @@
 # CubeSolver
 A desktop app that solves Rubik's Cubes in 24 moves or less using a variation of Kociemba's algorithm. This app was made as a hobby project, which gave me a challenge to create a simpler and easier to understand implementation of a solving algorithm, as well as a way to learn how to delvelop GUI apps. 
-The app includes an interactive 2-d cube on which face turns may be applied, as well as an editor for user input patterns. Includes pattern validation and random scramblingand a display for the solution, which shows the colors of the faces to be turned, as well as the notation that matches the buttons to allow for solving the 2d-cube. The display also shows the amount of time it took for each solution to be found. For more information about how the algorithm works, see the HOW_CUBESOLVER_WORKS.md file
+The app includes an interactive 2-d cube on which face turns may be applied, as well as an editor for user input patterns. Includes pattern validation and random scramblingand a display for the solution, which shows the colors of the faces to be turned, as well as the notation that matches the buttons to allow for solving the 2d-cube. The display also shows the amount of time it took for each solution to be found. For more information about how the algorithm works, see the [HOW_CUBESOLVER_WORKS.txt](HOW_CUBESOLVER_WORKS.txt) file
 
 ## Getting started
 ### Hardware Requirements
@@ -49,10 +49,11 @@ GitHub) or reach me at dylanevans595@gmail.com.
 * Qt 5.14.0 (MSVC 2017) -- The framework used
 
 ## Contributing
-Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests to us.
+Simply make a pull request, create an issue, or reach me at dylanevans595@gmail.com if you wish to suggest improvements or provide
+additional features
 
 ## License
-This project is licensed under the MIT License
+This project is licensed under the MIT License, which can be found [here](LICENSE)
 Note that this project uses Qt 5.14.0 libraries, which are licensed under LGPLv3.
 
 ## Credits
